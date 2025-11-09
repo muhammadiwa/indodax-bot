@@ -1,0 +1,3 @@
+# Alembic Versions
+
+Tempatkan file migrasi di sini. Gunakan `alembic revision --autogenerate -m "message"`.

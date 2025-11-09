@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "indodax-bot"
+version = "0.1.0"
+description = "Production-grade Telegram trading bot for Indodax"
+authors = ["Your Name <you@example.com>"]
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.110.0"
+uvicorn = {extras = ["standard"], version = "^0.29.0"}
+aiogram = "^3.4.1"
+aiohttp = "^3.9.5"
+httpx = "^0.27.0"
+python-dotenv = "^1.0.1"
+redis = "^5.0.3"
+sqlmodel = "^0.0.14"
+asyncpg = "^0.29.0"
+cryptography = "^42.0.5"
+apscheduler = "^3.10.4"
+structlog = "^24.1.0"
+pendulum = "^3.0.0"
+loguru = "^0.7.2"
+python-rapidjson = "^1.13"
+pydantic-settings = "^2.2.1"
+alembic = "^1.13.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.1.1"
+pytest-asyncio = "^0.23.5"
+respx = "^0.20.2"
+
+[build-system]
+requires = ["poetry-core>=1.8.0"]
+build-backend = "poetry.core.masonry.api"

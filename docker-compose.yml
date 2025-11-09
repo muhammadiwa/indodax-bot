@@ -1,0 +1,77 @@
+version: "3.9"
+
+services:
+  trading-core-api:
+    build:
+      context: .
+      dockerfile: docker/trading-core.Dockerfile
+    env_file: .env
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - APP_SECRET_KEY=${APP_SECRET_KEY}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - INTERNAL_AUTH_TOKEN=${INTERNAL_AUTH_TOKEN}
+      - BOT_INTERNAL_WEBHOOK=${BOT_INTERNAL_WEBHOOK}
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "8000:8000"
+
+  telegram-bot-service:
+    build:
+      context: .
+      dockerfile: docker/telegram-bot.Dockerfile
+    env_file: .env
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - CORE_API_BASE_URL=${CORE_API_BASE_URL}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - REDIS_URL=${REDIS_URL}
+      - BOT_INTERNAL_HOST=${BOT_INTERNAL_HOST}
+      - BOT_INTERNAL_PORT=${BOT_INTERNAL_PORT}
+      - CORE_API_INTERNAL_TOKEN=${CORE_API_INTERNAL_TOKEN}
+    depends_on:
+      - trading-core-api
+
+  worker-service:
+    build:
+      context: .
+      dockerfile: docker/worker.Dockerfile
+    env_file: .env
+    environment:
+      - CORE_API_BASE_URL=${CORE_API_BASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - APP_SECRET_KEY=${APP_SECRET_KEY}
+      - LOG_LEVEL=${LOG_LEVEL}
+      - SCHEDULER_TIMEZONE=${SCHEDULER_TIMEZONE}
+      - WORKER_POLL_INTERVAL_SECONDS=${WORKER_POLL_INTERVAL_SECONDS}
+      - CORE_API_INTERNAL_TOKEN=${CORE_API_INTERNAL_TOKEN}
+      - PRICE_FEED_WS_URL=${PRICE_FEED_WS_URL}
+    depends_on:
+      - trading-core-api
+      - redis
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: indodax
+      POSTGRES_USER: indodax
+      POSTGRES_PASSWORD: indodax
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+volumes:
+  postgres-data:
+  redis-data:
